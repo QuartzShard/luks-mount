@@ -11,3 +11,4 @@ mv ./luks-mount.sh /usr/local/bin/luks-mount
 mv ./luks-mount.shlib /usr/local/lib/
 mv ./luks-mount.cfg /etc/
 chmod a+x /usr/local/bin/luks-mount
+echo "Installed Successfully!"
