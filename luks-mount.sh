@@ -35,7 +35,7 @@ mntname=${mntname}
 #Default mount path in /mnt/
 mntpath=${mntpath}
 #Flag for config script
-configured='true' " > luks-mount.cfg
+configured='true' " > /etc/luks-mount.cfg
 	luks-mount help
 	exit
 else
