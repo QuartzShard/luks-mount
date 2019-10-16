@@ -50,6 +50,8 @@ if [[ $1 == *'help'* ]] ; then #Print help
 	echo 'Options:'
 	echo '	mount <device>: Prompt for LUKS key and mount the partition'
 	echo '	umount: Unmount the drive and lock the LUKS partition'
+	echo '	setup <device>: Create a new LUKS partition on the device'
+	echo ' 					(WARNING; Will overwrite all data on device)'
 	echo '	help: Display this information'
 elif [[ ( $1 == 'mount'* && $2 == 'sd'* ) ]] ; then #Unlock & mount
 	cryptsetup luksOpen /dev/$2 $uuid 
@@ -58,7 +60,7 @@ elif [[ $1 == 'umount'* ]] ; then #Unmount & lock
 	umount $mntpath$mntname
 	cryptsetup luksClose /dev/mapper/$uuid
 	systemctl daemon-reload
-elif [[ ($1 == 'setup'* && $2 == 'sd'* )]] ; then
+elif [[ ($1 == *'setup'* && $2 == 'sd'* )]] ; then
 	cryptsetup -y -v luksFormat /dev/$2
 	cryptsetup luksOpen /dev/$2 $uuid
 	echo -n "Write zeros to new partition? (Slow, but adds security) [Y/N]: "
