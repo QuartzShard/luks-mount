@@ -12,7 +12,7 @@ then
   apt-get install cryptsetup -y;
 fi
 
-source luks-mount.shlib
+source /usr/local/lib/luks-mount.shlib
 if [[ "$(config_get configured)" == *"false"* ]]; then
 while [[ $uuid == '' && $mntname == '' ]]; do
 	echo -n "Device uuid (luks-UUID_String): "

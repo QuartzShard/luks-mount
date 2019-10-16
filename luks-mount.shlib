@@ -3,6 +3,6 @@ config_read_file() {
 }
 
 config_get() {
-    val="$(config_read_file luks-mount.cfg "${1}")";
+    val="$(config_read_file /etc/luks-mount.cfg "${1}")";
     printf -- "%s" "${val}";
 }
