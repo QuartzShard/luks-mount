@@ -55,6 +55,7 @@ elif [[ ( $1 == 'mount'* && $2 == 'sd'* ) ]] ; then #Unlock & mount
 	cryptsetup luksOpen /dev/$2 $uuid && mount /dev/mapper/$uuid $mntpath$mntname
 elif [[ $1 == 'umount'* ]] ; then #Unmount & lock
 	umount $mntpath$mntname &&	cryptsetup luksClose /dev/mapper/$uuid
+	systemctl daemon-reload
 else
 	echo "Unkown usage case, try 'luks-mount help'."
 fi
