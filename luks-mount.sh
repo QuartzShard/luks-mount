@@ -36,7 +36,7 @@ mntname=${mntname}
 mntpath=${mntpath}
 #Flag for config script
 configured='true' " > luks-mount.cfg
-	./luks-mount.sh help
+	luks-mount help
 	exit
 else
 	uuid="$(config_get uuid)"
