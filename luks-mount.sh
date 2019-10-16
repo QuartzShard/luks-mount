@@ -52,10 +52,23 @@ if [[ $1 == *'help'* ]] ; then #Print help
 	echo '	umount: Unmount the drive and lock the LUKS partition'
 	echo '	help: Display this information'
 elif [[ ( $1 == 'mount'* && $2 == 'sd'* ) ]] ; then #Unlock & mount
-	cryptsetup luksOpen /dev/$2 $uuid && mount /dev/mapper/$uuid $mntpath$mntname
+	cryptsetup luksOpen /dev/$2 $uuid 
+	mount /dev/mapper/$uuid $mntpath$mntname
 elif [[ $1 == 'umount'* ]] ; then #Unmount & lock
-	umount $mntpath$mntname &&	cryptsetup luksClose /dev/mapper/$uuid
+	umount $mntpath$mntname
+	cryptsetup luksClose /dev/mapper/$uuid
 	systemctl daemon-reload
+elif [[ ($1 == 'setup'* && $2 == 'sd'* )]] ; then
+	cryptsetup -y -v luksFormat /dev/$2
+	cryptsetup luksOpen /dev/$2 $uuid
+	echo -n "Write zeros to new partition? (Slow, but adds security) [Y/N]: "
+	read zero
+	if [[$zero == 'Y']]; then
+		dd if=/dev/zero of=/dev/mapper/$uuid status=progress
+	fi
+	mkfs.ext4 /dev/mapper/$uuid
+	mkdir $mntpath$mntname
+	mount /dev/mapper/$uuid $mntpath$mntname
 else
 	echo "Unkown usage case, try 'luks-mount help'."
 fi
