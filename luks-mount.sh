@@ -51,11 +51,14 @@ if [[ $1 == *'help'* ]] ; then #Print help
 	echo '	mount <device>: Prompt for LUKS key and mount the partition'
 	echo '	umount: Unmount the drive and lock the LUKS partition'
 	echo '	setup <device>: Create a new LUKS partition on the device'
-	echo ' 					(WARNING; Will overwrite all data on device)'
+	echo ' 	                (WARNING; Will overwrite all data on device)'
 	echo '	help: Display this information'
 elif [[ ( $1 == 'mount'* && $2 == 'sd'* ) ]] ; then #Unlock & mount
 	cryptsetup luksOpen /dev/$2 $uuid 
 	mount /dev/mapper/$uuid $mntpath$mntname
+	mntstr=$(df -h | grep $mntname || echo 'Error! Drive not mounted.')
+	echo 'Device mount details:'
+	echo $mntstr
 elif [[ $1 == 'umount'* ]] ; then #Unmount & lock
 	umount $mntpath$mntname
 	cryptsetup luksClose /dev/mapper/$uuid
@@ -71,6 +74,9 @@ elif [[ ($1 == *'setup'* && $2 == 'sd'* )]] ; then
 	mkfs.ext4 /dev/mapper/$uuid
 	mkdir $mntpath$mntname
 	mount /dev/mapper/$uuid $mntpath$mntname
+	mntstr=$(df -h | grep $mntname || echo 'Error! Drive not mounted.')
+	echo 'Device mount details:'
+	echo $mntstr
 else
 	echo "Unkown usage case, try 'luks-mount help'."
 fi
