@@ -35,13 +35,13 @@ mntname=${mntname}
 #Default mount path in /mnt/
 mntpath=${mntpath}
 #Flag for config script
-configured='true' " > /etc/luks-mount.cfg
+configured='true' " > /etc/luks-mount/default.cfg
 	luks-mount help
 	exit
 else
-	uuid="$(config_get uuid)"
-	mntname="$(config_get mntname)"
-	mntpath="$(config_get mntpath)"
+	uuid="$(config_get uuid default.cfg)"
+	mntname="$(config_get mntname default.cfg)"
+	mntpath="$(config_get mntpath default.cfg)"
 fi
 
 #Check args
