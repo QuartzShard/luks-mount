@@ -13,7 +13,7 @@ then
 fi
 
 source /usr/local/lib/luks-mount.shlib
-if [[ "$(config_get configured)" == *"false"* ]]; then
+if [[ "$(config_get configured default.cfg)" == *"false"* ]]; then
 echo 'No default config found, please set one:'
 while [[ $uuid == '' && $mntname == '' ]]; do
 	echo -n "Device uuid (luks-UUID_String): "
@@ -25,7 +25,7 @@ while [[ $uuid == '' && $mntname == '' ]]; do
 	if [[ $mountpath == *'/'* ]]; then
 		mntpath=mountpath
 	else
-		mntpath="$(config_get mntpath)"
+		mntpath="$(config_get mntpath default.cfg)"
 	fi
 	done
 	echo "#Device UUID
@@ -56,7 +56,7 @@ else
 			if [[ $mountpath == *'/'* ]]; then
 				mntpath=mountpath
 			else
-				mntpath="$(config_get mntpath)"
+				mntpath="$(config_get mntpath default.cfg)"
 			fi
 		done
 	echo "#Device UUID
