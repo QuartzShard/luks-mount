@@ -98,7 +98,7 @@ if [[ ${@:$OPTIND:1} == *'help'* ]] ; then #Print help
 	echo '	umount: Unmount the drive and lock the LUKS partition'
 	echo '	setup <device>: Create a new LUKS partition on the device (WARNING; Will overwrite all data on device)'
 	echo '	help: Display this information'
-elif [[ ( ${@:$OPTIND:1}== 'mount'* && ${@:$OPTIND+1:1} == 'sd'* ) ]] ; then #Unlock & mount
+elif [[ ( ${@:$OPTIND:1} == 'mount'* && ${@:$OPTIND+1:1} == 'sd'* ) ]] ; then #Unlock & mount
 	cryptsetup luksOpen /dev/$2 $uuid 
 	mount /dev/mapper/$uuid $mntpath$mntname
 	mntstr=$(df -h | grep $mntname || echo 'Error! Drive not mounted.')
