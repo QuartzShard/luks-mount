@@ -44,6 +44,7 @@ else
 	h)
 		luks-mount help
 		exit
+		;;
 	n)
 		echo "Creating new config profile ${OPTARG}:"
 		while [[ $uuid == '' && $mntname == '' ]]; do
