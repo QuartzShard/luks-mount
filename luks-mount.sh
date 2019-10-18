@@ -39,7 +39,10 @@ configured='true' " > /etc/luks-mount/default.cfg
 	luks-mount help
 	exit
 else
-	while getopts "hp::" arg; do
+	uuid="$(config_get uuid default.cfg)"
+	mntname="$(config_get mntname default.cfg)"
+	mntpath="$(config_get mntpath default.cfg)"
+	while getopts "hp::n::" arg; do
 	case $arg in
 	h)
 		luks-mount help
@@ -76,11 +79,6 @@ configured='true' " > /etc/luks-mount/${OPTARG}.cfg
 		uuid="$(config_get uuid ${OPTARG}.cfg)"
 		mntname="$(config_get mntname ${OPTARG}.cfg)"
 		mntpath="$(config_get mntpath ${OPTARG}.cfg)"
-		;;
-	*)
-		uuid="$(config_get uuid default.cfg)"
-		mntname="$(config_get mntname default.cfg)"
-		mntpath="$(config_get mntpath default.cfg)"
 		;;
 	esac
 	done
