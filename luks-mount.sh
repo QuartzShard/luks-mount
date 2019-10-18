@@ -107,7 +107,9 @@ elif [[ ( ${ARG1} == 'mount'* && ${ARG2} == 'sd'* ) ]] ; then #Unlock & mount
 	if [ ! -d "${mntpath}${mntname}" ]; then
 		mkdir -p ${mntpath}${mntname}
 	fi
+	systemctl daemon-reload
 	mount /dev/mapper/$uuid $mntpath$mntname
+	sleep 0.25
 	mntstr=$(df -h | grep $mntname || echo 'Error! Drive not mounted.')
 	echo 'Device mount details:'
 	echo $mntstr
