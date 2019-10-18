@@ -60,12 +60,14 @@ fi
 
 #Check args
 if [[ ${@:$OPTIND:1} == *'help'* ]] ; then #Print help
-	echo 'Usage: luks-mount <Option>'
+	echo 'Usage: luks-mount <flags> <Option>'
+	echo 'Flags:'
+	echo '	-p: specify a profile to use over default'
+	echo '	-h: display this help'
 	echo 'Options:'
 	echo '	mount <device>: Prompt for LUKS key and mount the partition'
 	echo '	umount: Unmount the drive and lock the LUKS partition'
-	echo '	setup <device>: Create a new LUKS partition on the device'
-	echo ' 	                (WARNING; Will overwrite all data on device)'
+	echo '	setup <device>: Create a new LUKS partition on the device (WARNING; Will overwrite all data on device)'
 	echo '	help: Display this information'
 elif [[ ( ${@:$OPTIND:1}== 'mount'* && ${@:$OPTIND+1:1} == 'sd'* ) ]] ; then #Unlock & mount
 	cryptsetup luksOpen /dev/$2 $uuid 
