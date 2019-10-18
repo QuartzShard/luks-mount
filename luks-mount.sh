@@ -50,6 +50,8 @@ else
 		;;
 	n)
 		echo "Creating new config profile ${OPTARG}:"
+		uuid=''
+		mntname=''
 		while [[ $uuid == '' && $mntname == '' ]]; do
 			echo -n "Device uuid (luks-UUID_String): "
 			read uuid
@@ -85,7 +87,9 @@ configured='true' " > /etc/luks-mount/${OPTARG}.cfg
 fi
 
 #Check args
-if [[ ${@:$OPTIND:1} == *'help'* ]] ; then #Print help
+ARG1 = ${@:$OPTIND:1}
+ARG2 = ${@:$OPTIND+1:1}
+if [[ ${ARG1} == *'help'* ]] ; then #Print help
 	echo 'Usage: luks-mount <flags> <Option>'
 	echo 'Flags:'
 	echo '	-p: specify a profile to use over default'
@@ -96,19 +100,19 @@ if [[ ${@:$OPTIND:1} == *'help'* ]] ; then #Print help
 	echo '	umount: Unmount the drive and lock the LUKS partition'
 	echo '	setup <device>: Create a new LUKS partition on the device (WARNING; Will overwrite all data on device)'
 	echo '	help: Display this information'
-elif [[ ( ${@:$OPTIND:1} == 'mount'* && ${@:$OPTIND+1:1} == 'sd'* ) ]] ; then #Unlock & mount
-	cryptsetup luksOpen /dev/$2 $uuid 
+elif [[ ( ${ARG1} == 'mount'* && ${ARG2} == 'sd'* ) ]] ; then #Unlock & mount
+	cryptsetup luksOpen /dev/${ARG2} $uuid 
 	mount /dev/mapper/$uuid $mntpath$mntname
 	mntstr=$(df -h | grep $mntname || echo 'Error! Drive not mounted.')
 	echo 'Device mount details:'
 	echo $mntstr
-elif [[ ${@:$OPTIND:1} == 'umount'* ]] ; then #Unmount & lock
+elif [[ ${ARG1} == 'umount'* ]] ; then #Unmount & lock
 	umount $mntpath$mntname
 	cryptsetup luksClose /dev/mapper/$uuid
 	systemctl daemon-reload
-elif [[ (${@:$OPTIND:1} == *'setup'* && $2 == 'sd'* )]] ; then
-	cryptsetup -y -v luksFormat /dev/$2
-	cryptsetup luksOpen /dev/$2 $uuid
+elif [[ (${ARG1} == *'setup'* && ${ARG2} == 'sd'* )]] ; then
+	cryptsetup -y -v luksFormat /dev/${ARG2}
+	cryptsetup luksOpen /dev/${ARG2} $uuid
 	echo -n "Write zeros to new partition? (Slow, but adds security) [Y/N]: "
 	read zero
 	if [[$zero == 'Y']]; then
