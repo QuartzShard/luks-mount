@@ -9,6 +9,8 @@ fi
 
 mv ./luks-mount.sh /usr/local/bin/luks-mount
 mv ./luks-mount.shlib /usr/local/lib/
-mv ./luks-mount.cfg /etc/
+mkdir /etc/luks-mount
+mv ./luks-mount.cfg /etc/luks-mount/default.cfg
 chmod a+x /usr/local/bin/luks-mount
 echo "Installed Successfully!"
+rm ./luks-mount-install.sh 
