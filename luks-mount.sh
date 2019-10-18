@@ -67,6 +67,9 @@ mntname=${mntname}
 mntpath=${mntpath}
 #Flag for config script
 configured='true' " > /etc/luks-mount/${OPTARG}.cfg
+		uuid="$(config_get uuid ${OPTARG}.cfg)"
+		mntname="$(config_get mntname ${OPTARG}.cfg)"
+		mntpath="$(config_get mntpath ${OPTARG}.cfg)"
 		;;	
 	p)
 		uuid="$(config_get uuid ${OPTARG}.cfg)"
