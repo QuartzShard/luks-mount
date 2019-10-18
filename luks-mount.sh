@@ -44,6 +44,30 @@ else
 	h)
 		luks-mount help
 		exit
+	n)
+		echo "Creating new config profile ${OPTARG}:"
+		while [[ $uuid == '' && $mntname == '' ]]; do
+			echo -n "Device uuid (luks-UUID_String): "
+			read uuid
+			echo -n "mount name: "
+			read mntname
+			echo -n "mount path (default /mnt/${mntname}, exclude mount name if custom): "
+			read mountpath
+			if [[ $mountpath == *'/'* ]]; then
+				mntpath=mountpath
+			else
+				mntpath="$(config_get mntpath)"
+			fi
+		done
+	echo "#Device UUID
+uuid=${uuid}
+#name of directory
+mntname=${mntname}
+#Default mount path in /mnt/
+mntpath=${mntpath}
+#Flag for config script
+configured='true' " > /etc/luks-mount/${OPTARG}.cfg
+		;;	
 	p)
 		uuid="$(config_get uuid ${OPTARG}.cfg)"
 		mntname="$(config_get mntname ${OPTARG}.cfg)"
@@ -63,6 +87,7 @@ if [[ ${@:$OPTIND:1} == *'help'* ]] ; then #Print help
 	echo 'Usage: luks-mount <flags> <Option>'
 	echo 'Flags:'
 	echo '	-p: specify a profile to use over default'
+	echo ' 	-n: configure a new profile'
 	echo '	-h: display this help'
 	echo 'Options:'
 	echo '	mount <device>: Prompt for LUKS key and mount the partition'
