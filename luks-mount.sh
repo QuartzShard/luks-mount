@@ -12,6 +12,8 @@ then
   apt-get install cryptsetup -y;
 fi
 
+USAGE="Usage: luks-mount [-n <profile>|-p <profile>|-h] [mount|umount|setup|help]"
+
 source /usr/local/lib/luks-mount.shlib
 if [[ "$(config_get configured default.cfg)" == *"false"* ]]; then
 echo 'No default config found, please set one:'
@@ -60,7 +62,7 @@ else
 			echo -n "mount path (default /mnt/${mntname}, exclude mount name if custom): "
 			read mountpath
 			if [[ $mountpath == *'/'* ]]; then
-				mntpath=mountpath
+				mntpath=$mountpath
 			else
 				mntpath="$(config_get mntpath default.cfg)"
 			fi
@@ -87,13 +89,13 @@ configured='true' " > /etc/luks-mount/${OPTARG}.cfg
 fi
 
 #Check args
-ARG1 = ${@:$OPTIND:1}
-ARG2 = ${@:$OPTIND+1:1}
+ARG1=${@:$OPTIND:1}
+ARG2=${@:$OPTIND+1:1}
 if [[ ${ARG1} == *'help'* ]] ; then #Print help
-	echo 'Usage: luks-mount <flags> <Option>'
+	echo ${USAGE}
 	echo 'Flags:'
-	echo '	-p: specify a profile to use over default'
-	echo ' 	-n: configure a new profile'
+	echo '	-p <profile name>: specify a profile to use over default'
+	echo ' 	-n <profile name>: configure a new profile'
 	echo '	-h: display this help'
 	echo 'Options:'
 	echo '	mount <device>: Prompt for LUKS key and mount the partition'
@@ -102,6 +104,9 @@ if [[ ${ARG1} == *'help'* ]] ; then #Print help
 	echo '	help: Display this information'
 elif [[ ( ${ARG1} == 'mount'* && ${ARG2} == 'sd'* ) ]] ; then #Unlock & mount
 	cryptsetup luksOpen /dev/${ARG2} $uuid 
+	if [ ! -d "${mntpath}${mntname}" ]; then
+		mkdir -p ${mntpath}${mntname}
+	fi
 	mount /dev/mapper/$uuid $mntpath$mntname
 	mntstr=$(df -h | grep $mntname || echo 'Error! Drive not mounted.')
 	echo 'Device mount details:'
@@ -125,5 +130,5 @@ elif [[ (${ARG1} == *'setup'* && ${ARG2} == 'sd'* )]] ; then
 	echo 'Device mount details:'
 	echo $mntstr
 else
-	echo "Unkown usage case, try 'luks-mount help'."
+	echo ${USAGE}
 fi
