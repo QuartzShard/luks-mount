@@ -14,6 +14,7 @@ fi
 
 source /usr/local/lib/luks-mount.shlib
 if [[ "$(config_get configured)" == *"false"* ]]; then
+echo 'No default config found, please set one:'
 while [[ $uuid == '' && $mntname == '' ]]; do
 	echo -n "Device uuid (luks-UUID_String): "
 	read uuid
@@ -27,7 +28,6 @@ while [[ $uuid == '' && $mntname == '' ]]; do
 		mntpath="$(config_get mntpath)"
 	fi
 	done
-	configured="true"
 	echo "#Device UUID
 uuid=${uuid}
 #name of directory
@@ -39,13 +39,27 @@ configured='true' " > /etc/luks-mount/default.cfg
 	luks-mount help
 	exit
 else
-	uuid="$(config_get uuid default.cfg)"
-	mntname="$(config_get mntname default.cfg)"
-	mntpath="$(config_get mntpath default.cfg)"
+	while getopts "hp::" arg; do
+	case $arg in
+	h)
+		luks-mount help
+		exit
+	p)
+		uuid="$(config_get uuid ${OPTARG}.cfg)"
+		mntname="$(config_get mntname ${OPTARG}.cfg)"
+		mntpath="$(config_get mntpath ${OPTARG}.cfg)"
+		;;
+	*)
+		uuid="$(config_get uuid default.cfg)"
+		mntname="$(config_get mntname default.cfg)"
+		mntpath="$(config_get mntpath default.cfg)"
+		;;
+	esac
+	done
 fi
 
 #Check args
-if [[ $1 == *'help'* ]] ; then #Print help
+if [[ ${@:$OPTIND:1} == *'help'* ]] ; then #Print help
 	echo 'Usage: luks-mount <Option>'
 	echo 'Options:'
 	echo '	mount <device>: Prompt for LUKS key and mount the partition'
@@ -53,17 +67,17 @@ if [[ $1 == *'help'* ]] ; then #Print help
 	echo '	setup <device>: Create a new LUKS partition on the device'
 	echo ' 	                (WARNING; Will overwrite all data on device)'
 	echo '	help: Display this information'
-elif [[ ( $1 == 'mount'* && $2 == 'sd'* ) ]] ; then #Unlock & mount
+elif [[ ( ${@:$OPTIND:1}== 'mount'* && ${@:$OPTIND+1:1} == 'sd'* ) ]] ; then #Unlock & mount
 	cryptsetup luksOpen /dev/$2 $uuid 
 	mount /dev/mapper/$uuid $mntpath$mntname
 	mntstr=$(df -h | grep $mntname || echo 'Error! Drive not mounted.')
 	echo 'Device mount details:'
 	echo $mntstr
-elif [[ $1 == 'umount'* ]] ; then #Unmount & lock
+elif [[ ${@:$OPTIND:1} == 'umount'* ]] ; then #Unmount & lock
 	umount $mntpath$mntname
 	cryptsetup luksClose /dev/mapper/$uuid
 	systemctl daemon-reload
-elif [[ ($1 == *'setup'* && $2 == 'sd'* )]] ; then
+elif [[ (${@:$OPTIND:1} == *'setup'* && $2 == 'sd'* )]] ; then
 	cryptsetup -y -v luksFormat /dev/$2
 	cryptsetup luksOpen /dev/$2 $uuid
 	echo -n "Write zeros to new partition? (Slow, but adds security) [Y/N]: "
